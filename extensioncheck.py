@@ -4,8 +4,8 @@ import os.path
 import time
 
 start_time = time.time()
-checkdir = "ENTER_YOUR_PATH" #директория для работы скрипта
-deleted_files_dir = "ENTER_YOUR_PATH" #директория карантин
+checkdir = r"D:\user\Designers2Managers\эскизы"
+deleted_files_dir = r"C:\Users\sadmin\Desktop\d2m_check\deleted_files"
 files_tree = os.walk(checkdir)
 file_counter = 0
 deleted_file_counter = 0
@@ -18,13 +18,16 @@ for address, dirs, files in files_tree:
 		full_path = os.path.join(address, file).replace("\\","/") #вычисляем полный путь для передачи в imghdr
 		file_directory = os.path.join(address) + "/"
 		extension = imghdr.what(full_path) #узнаем формат изображения
-		if extension == "jpeg": #Проверка условия что картинка является jpegом
-			print(file + " PASSED") # не трогаем
+		if extension != "jpeg": #Проверка условия что картинка не является jpegом
+                        if file == "Thumbs.db" or file == "sync.ffs_db": #исключение из логирования системных файлов
+                                print(file + " системный файл")
+                        else:
+                                deleted_file_counter += 1
+                                print(file + " WARNING, FILE WILL BE DELETED")
+                                #os.replace(file_directory + file, deleted_files_dir + file) #Переносим файл в карантин для аудита
+                                log_deleted_file.write(full_path + '\n') #пишем в лог полный путь и имя файла
 		else:
-			deleted_file_counter += 1
-			print(file + " WARNING, FILE WILL BE DELETED")
-			os.replace(file_directory + file, deleted_files_dir + file) #Переносим файл в карантин для аудита
-			log_deleted_file.write(full_path + '\n') #пишем в лог полный путь и имя файла
+                        print(file + " FILE IS JPEG") #не трогаем
 
 #закрываем запись в лог
 log_deleted_file.close()
