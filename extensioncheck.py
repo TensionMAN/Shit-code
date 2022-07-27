@@ -20,20 +20,22 @@ for address, dirs, files in files_tree:
 		extension = imghdr.what(full_path) #узнаем формат изображения
 		if extension != "jpeg": #Проверка условия что картинка не является jpegом
                         if file == "Thumbs.db" or file == "sync.ffs_db": #исключение из логирования системных файлов
-                                print(file + " системный файл")
+                                #print(file + " системный файл") #debug
+                                os.remove(file_directory + file) #все равно удаляем, во измежание попыток мимикрирования под системный файл
                         else:
                                 deleted_file_counter += 1
                                 print(file + " WARNING, FILE WILL BE DELETED")
-                                #os.replace(file_directory + file, deleted_files_dir + file) #Переносим файл в карантин для аудита
+                                os.replace(file_directory.replace("\\","/") + file, deleted_files_dir.replace("\\","/") + file) #Переносим файл в карантин для аудита
                                 log_deleted_file.write(full_path + '\n') #пишем в лог полный путь и имя файла
 		else:
-                        print(file + " FILE IS JPEG") #не трогаем
+                        pass
+                        #print(file + " FILE IS JPEG") #не трогаем
 
-#закрываем запись в лог
-log_deleted_file.close()
+
+log_deleted_file.close() #закрываем запись в лог
 
 #Debug info
 print("Обработано " + str(file_counter) + " файлов")
-print("Удалено " + str(deleted_file_counter) + " файлов")
+print("Перемещено в карантин " + str(deleted_file_counter) + " файлов")
 print("--- %s seconds ---" % (time.time() - start_time))
 
